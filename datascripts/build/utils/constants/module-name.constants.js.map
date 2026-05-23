@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../utils/constants/module-name.constants.ts"],"sourcesContent":["export const MODULE_NAME = \"nikev\";\n"],"names":["MODULE_NAME"],"mappings":";;;;;AAAO,KAAK,CAACA,WAAW,GAAG,CAAO;QAArBA,WAAW,GAAXA,WAAW"}

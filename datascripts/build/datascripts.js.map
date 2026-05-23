@@ -1,0 +1,1 @@
+{"version":3,"sources":["../datascripts.ts"],"sourcesContent":["import { std } from \"wow/wotlk\";\n\nconst NO_MANS_LAND_HYJAL_ID = 42202;\nstd.Spells.load(NO_MANS_LAND_HYJAL_ID).delete();\n"],"names":["NO_MANS_LAND_HYJAL_ID","Spells","load","delete"],"mappings":";AAAoB,GAAW,CAAX,MAAW;AAE/B,KAAK,CAACA,qBAAqB,GAAG,KAAK;AAFf,MAAW,KAG3BC,MAAM,CAACC,IAAI,CAACF,qBAAqB,EAAEG,MAAM"}
