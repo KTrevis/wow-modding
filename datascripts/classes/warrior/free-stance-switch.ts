@@ -13,7 +13,7 @@ FREE_STANCE_SWITCH.Effects.get(0).PointsBase.set(99);
 
 const STANCE_NO_RANGE_ITEM = std.Items.create(MODULE_NAME, ID + "RING")
   .Class.MISC.set()
-  .InventoryType.FINGER.set()
+  .InventoryType.TRINKET.set()
   .Name.enGB.set("Free Stance Switch Ring")
   .Quality.ORANGE.set()
   .Spells.addMod((spellItem) => spellItem.Spell.set(FREE_STANCE_SWITCH.ID))
