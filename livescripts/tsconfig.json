@@ -2,25 +2,22 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
+        "outDir": "./build",
+        "rootDir": "../",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "sourceMap": true,
         "experimentalDecorators": true,
-        "forceConsistentCasingInFileNames": true,
-        "outDir": "build\\default.dataset\\lua"
+        "forceConsistentCasingInFileNames": true
     },
-    "tstl": {
-        "luaTarget": "5.4",
-        "noImplicitSelf": true,
-        "luaPlugins": [
-            {
-                "name": "C:\\perso\\dev\\tswow-install\\bin\\scripts\\addons\\addons\\LuaORM.js",
-                "import": "LuaORM"
-            }
-        ]
-    },
+    "include": [
+        "./",
+        "../Ids.ts",
+        "../shared"
+    ],
     "exclude": [
-        "./livescripts/build/lib"
+        "./build",
+        "../data",
+        "../addons"
     ]
 }
