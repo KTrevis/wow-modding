@@ -1,4 +1,4 @@
-import type { Goal } from "./goal-types";
+import { Goal } from "../../shared/goal/goal.types";
 
 export const defaultGoals: Goal[] = [
   {

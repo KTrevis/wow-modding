@@ -1,9 +1,20 @@
-import { ADDON_PREFIXES } from "../shared/prefix";
+import { AccountGoalStore } from "./goals/account-goal-store";
+import { AddonPrefix } from "../shared/prefix";
+import { goalLivescript } from "./goals/goal.livescript";
+
+export function getAddonMessageBody(
+  message: string,
+  prefix: AddonPrefix,
+): string | undefined {
+  if (!message.startsWith(prefix)) {
+    return undefined;
+  }
+
+  return message.substring(prefix.length + 1, message.length);
+}
 
 export function Main(events: TSEvents) {
-  events.Player.OnSay((player) => {
-    const object = new TSJsonObject();
-    object.SetString("type", "test");
-    player.SendAddonMessage(ADDON_PREFIXES.GOALS, object.toString(), 0, player);
-  });
+  AccountGoalStore.ensureTable();
+
+  goalLivescript(events);
 }

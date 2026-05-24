@@ -1,12 +1,13 @@
-import { defaultGoals } from "./goal-data";
-import { createGoalCard } from "./goal-card";
 import { createGoalsUi } from "./goal-ui";
 import { CARD_GAP, CARD_HEIGHT } from "./goal-style";
-import type { Goal, GoalCard } from "./goal-types";
-import { ADDON_PREFIXES } from "../../shared/prefix";
+import type { GoalCard } from "./goal-types";
+import { AddonPrefix } from "../../shared/prefix";
+import { Goal } from "../../shared/goal/goal.types";
+import { parseGoal } from "./goal-parse";
+import { createGoalCard } from "./goal-card";
 
 export class GoalController {
-  private goals: Goal[] = defaultGoals;
+  private goals: Goal[] = [];
   private readonly cards: GoalCard[] = [];
   private readonly ui = createGoalsUi();
 
@@ -72,12 +73,26 @@ export class GoalController {
     }
   }
 
+  addGoal(newGoal: Goal) {
+    if (this.goals.some((curr) => curr.id === newGoal.id)) {
+      this.updateGoal(newGoal);
+      return;
+    }
+    this.setGoals([...this.goals, newGoal]);
+  }
+
   render(): void {
     this.ui.frame.SetScript("OnEvent", (_self, _event, prefix, message) => {
-      if (prefix !== ADDON_PREFIXES.GOALS) {
+      if (prefix !== AddonPrefix.GOAL_ITEM) {
         return;
       }
-      print(message);
+      const goal = parseGoal(message);
+
+      if (!goal) {
+        return;
+      }
+
+      this.addGoal(goal);
     });
     const visible = this.visibleGoals();
 
@@ -109,35 +124,34 @@ export class GoalController {
     this.render();
   }
 
-  updateGoal(id: string, current: number, required?: number): void {
-    for (const goal of this.goals) {
-      if (goal.id === id) {
-        goal.current = current;
+  updateGoal(updatedGoal: Goal): void {
+    let goal = this.goals.find((goal) => goal.id === updatedGoal.id);
 
-        if (required !== undefined) {
-          goal.required = required;
-        }
-
-        this.render();
-        return;
-      }
+    if (!goal) {
+      return;
     }
+
+    goal = updatedGoal;
+
+    this.render();
   }
 
   claimGoal(id: string): void {
-    for (const goal of this.goals) {
-      if (goal.id === id) {
-        if (!this.isComplete(goal)) {
-          print("Goal incomplete.");
-          return;
-        }
-
-        goal.claimed = true;
-        print(`Reward claimed: ${goal.title}`);
-        this.render();
-        return;
-      }
+    const goal = this.goals.find((goal) => goal.id === id);
+    if (!this.isComplete(goal)) {
+      print("Goal incomplete.");
+      return;
     }
+
+    SendAddonMessage(
+      AddonPrefix.GOAL_CLAIM,
+      `${id}`,
+      "WHISPER",
+      UnitName("player"),
+    );
+    goal.claimed = true;
+    this.render();
+    return;
   }
 
   show(): void {

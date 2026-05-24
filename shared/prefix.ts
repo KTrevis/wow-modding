@@ -1,3 +1,4 @@
-export const ADDON_PREFIXES = {
-  GOALS: "NIKEV_GOALS",
-};
+export enum AddonPrefix {
+  GOAL_CLAIM = "NIKEV_GOAL_CLAIM",
+  GOAL_ITEM = "NIKEV_GOAL_ITEM",
+}

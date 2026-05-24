@@ -1,12 +1,3 @@
-export type Goal = {
-  id: string;
-  title: string;
-  description: string;
-  current: number;
-  required: number;
-  claimed?: boolean;
-};
-
 export type GoalCard = {
   frame: WoWAPI.Frame;
   title: WoWAPI.FontString;
