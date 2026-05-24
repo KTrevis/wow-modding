@@ -29,5 +29,5 @@ STANCE_NO_RANGE_ITEM.InlineScripts.OnEquip((_, player) => {
 
 STANCE_NO_RANGE_ITEM.InlineScripts.OnUnequip((_, player) => {
   const STANCE_NO_RAGE_ID = UTAG("nikev", "STANCE_NO_RAGE_LOST_SPELL_TAG");
-  player.RemoveSpell(STANCE_NO_RAGE_ID);
+  player.RemoveSpell(STANCE_NO_RAGE_ID, true, true);
 });
