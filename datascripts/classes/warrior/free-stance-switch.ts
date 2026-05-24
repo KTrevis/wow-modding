@@ -1,7 +1,7 @@
 import { std } from "wow/wotlk";
 import { MODULE_NAME } from "../../utils/constants/module-name.constants";
 
-const ID = "FREE_STANCE_SWITCH";
+const ID = "FREE_STANCE_SWITCH_";
 
 const FREE_STANCE_SWITCH = std.Spells.create(
   MODULE_NAME,
@@ -11,7 +11,7 @@ const FREE_STANCE_SWITCH = std.Spells.create(
 
 FREE_STANCE_SWITCH.Effects.get(0).PointsBase.set(99);
 
-const STANCE_NO_RANGE_ITEM = std.Items.create(MODULE_NAME, ID + "RING")
+const STANCE_NO_RANGE_ITEM = std.Items.create(MODULE_NAME, ID + "ITEM")
   .Class.MISC.set()
   .InventoryType.TRINKET.set()
   .Name.enGB.set("Free Stance Switch Ring")
@@ -21,7 +21,9 @@ const STANCE_NO_RANGE_ITEM = std.Items.create(MODULE_NAME, ID + "RING")
     MODULE_NAME,
     ID + "RING_ICON",
     "inv_jewelry_ring_36",
-  );
+  )
+  .ClassMask.set(0)
+  .ClassMask.WARRIOR.set(true);
 
 STANCE_NO_RANGE_ITEM.InlineScripts.OnEquip((_, player) => {
   const FREE_STANCE_SWITCH_ID = UTAG("nikev", "FREE_STANCE_SWITCH_SPELL_TAG");
