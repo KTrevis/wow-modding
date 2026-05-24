@@ -25,7 +25,7 @@ const STANCE_NO_RANGE_ITEM = std.Items.create(MODULE_NAME, ID + "ITEM")
   .ClassMask.set(0)
   .ClassMask.WARRIOR.set(true);
 
-STANCE_NO_RANGE_ITEM.InlineScripts.OnEquip((_, player) => {
+STANCE_NO_RANGE_ITEM.InlineScripts.OnEquip((item, player) => {
   const FREE_STANCE_SWITCH_ID = UTAG("nikev", "FREE_STANCE_SWITCH_SPELL_TAG");
   player.LearnSpell(FREE_STANCE_SWITCH_ID);
 });
