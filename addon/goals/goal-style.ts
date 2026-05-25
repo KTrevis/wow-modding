@@ -3,6 +3,12 @@ export const WINDOW_HEIGHT = 440;
 export const CARD_WIDTH = 500;
 export const CARD_HEIGHT = 150;
 export const CARD_GAP = 12;
+export const GOAL_SCROLL_STEP = 32;
+export const REWARD_BUTTON_WIDTH = 120;
+export const REWARD_BUTTON_HEIGHT = 28;
+export const TAB_FIRST_OFFSET_X = 16;
+export const TAB_FIRST_OFFSET_Y = 5;
+export const TAB_OVERLAP = -16;
 
 export const backdrop = {
   bgFile: "Interface\\DialogFrame\\UI-DialogBox-Background",

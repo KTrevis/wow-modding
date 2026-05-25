@@ -1,5 +1,6 @@
 import {
   CARD_WIDTH,
+  GOAL_SCROLL_STEP,
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
   backdrop,
@@ -65,7 +66,7 @@ export function createGoalsUi(): GoalsUi {
   scrollFrame.SetScript("OnMouseWheel", (_self, delta: number) => {
     const current = scrollFrame.GetVerticalScroll();
     const max = scrollFrame.GetVerticalScrollRange();
-    const next = Math.max(0, Math.min(max, current - delta * 32));
+    const next = Math.max(0, Math.min(max, current - delta * GOAL_SCROLL_STEP));
     scrollFrame.SetVerticalScroll(next);
   });
 

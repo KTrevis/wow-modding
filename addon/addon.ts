@@ -6,12 +6,14 @@ _G.NikevGoals = {
   Show: () => goalController.show(),
   Hide: () => goalController.hide(),
   Toggle: () => goalController.toggle(),
-  SetGoals: (...args: Parameters<GoalController["setGoals"]>) =>
-    goalController.setGoals(...args),
-  UpdateGoal: (...args: Parameters<GoalController["updateGoal"]>) =>
-    goalController.updateGoal(...args),
-  ClaimGoal: (...args: Parameters<GoalController["claimGoal"]>) =>
-    goalController.claimGoal(...args),
+  Debug: {
+    SetGoals: (...args: Parameters<GoalController["setGoals"]>) =>
+      goalController.setGoals(...args),
+    UpdateGoal: (...args: Parameters<GoalController["updateGoal"]>) =>
+      goalController.updateGoal(...args),
+    ClaimGoal: (...args: Parameters<GoalController["claimGoal"]>) =>
+      goalController.claimGoal(...args),
+  },
 };
 
 _G.SLASH_NIKEVGOALS1 = "/goals";

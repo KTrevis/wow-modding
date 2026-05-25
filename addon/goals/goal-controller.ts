@@ -1,5 +1,11 @@
 import { createGoalsUi } from "./goal-ui";
-import { CARD_GAP, CARD_HEIGHT } from "./goal-style";
+import {
+  CARD_GAP,
+  CARD_HEIGHT,
+  TAB_FIRST_OFFSET_X,
+  TAB_FIRST_OFFSET_Y,
+  TAB_OVERLAP,
+} from "./goal-style";
 import type { GoalCard } from "./goal-types";
 import { AddonPrefix } from "../../shared/prefix";
 import { Goal } from "../../shared/goal/goal.types";
@@ -22,6 +28,10 @@ export class GoalController {
   private readonly categories: string[] = [];
   private readonly ui = createGoalsUi();
   private selectedCategory = "";
+
+  constructor() {
+    this.bindEvents();
+  }
 
   private clampProgress(goal: Goal): number {
     if (goal.required <= 0) {
@@ -77,6 +87,21 @@ export class GoalController {
     SendAddonMessage(AddonPrefix.GOAL_READY, "", "WHISPER", UnitName("player"));
   }
 
+  private bindEvents(): void {
+    this.ui.frame.SetScript("OnEvent", (_self, _event, prefix, message) => {
+      if (prefix !== AddonPrefix.GOAL_ITEM) {
+        return;
+      }
+
+      const goal = parseGoal(message);
+      if (!goal) {
+        return;
+      }
+
+      this.upsertGoal(goal);
+    });
+  }
+
   private ensureCategory(category: string): void {
     if (this.categories.indexOf(category) !== -1) {
       return;
@@ -101,9 +126,15 @@ export class GoalController {
     });
     tab.SetScript("OnShow", () => PanelTemplates_TabResize(tab, 0));
     if (index === 0) {
-      tab.SetPoint("TOPLEFT", this.ui.frame, "BOTTOMLEFT", 16, 5);
+      tab.SetPoint(
+        "TOPLEFT",
+        this.ui.frame,
+        "BOTTOMLEFT",
+        TAB_FIRST_OFFSET_X,
+        TAB_FIRST_OFFSET_Y,
+      );
     } else {
-      tab.SetPoint("LEFT", this.ui.tabs[index - 1], "RIGHT", -16, 0);
+      tab.SetPoint("LEFT", this.ui.tabs[index - 1], "RIGHT", TAB_OVERLAP, 0);
     }
     this.ui.tabs.push(tab);
 
@@ -121,12 +152,36 @@ export class GoalController {
     }
   }
 
-  addGoal(newGoal: Goal) {
-    if (this.goals.some((curr) => curr.id === newGoal.id)) {
-      this.updateGoal(newGoal);
+  private sortGoals(goals: Goal[]): Goal[] {
+    return [...goals].sort((a, b) => {
+      if (a.claimed === b.claimed) {
+        return 0;
+      }
+
+      return a.claimed ? 1 : -1;
+    });
+  }
+
+  private getVisibleGoals(): Goal[] {
+    return this.sortGoals(this.goals).filter(
+      (goal) => goal.category === this.selectedCategory,
+    );
+  }
+
+  private upsertGoal(goal: Goal): void {
+    const index = this.goals.findIndex((curr) => curr.id === goal.id);
+
+    if (index === -1) {
+      this.goals.push(goal);
     } else {
-      this.setGoals([...this.goals, newGoal]);
+      this.goals[index] = goal;
     }
+
+    this.render();
+  }
+
+  addGoal(newGoal: Goal) {
+    this.upsertGoal(newGoal);
   }
 
   render(): void {
@@ -135,32 +190,11 @@ export class GoalController {
     }
     this.refreshTabs();
 
-    this.goals.sort((a, b) => {
-      if (a.claimed === b.claimed) {
-        return 0;
-      }
-
-      return a.claimed ? 1 : -1;
-    });
-    this.ui.frame.SetScript("OnEvent", (_self, _event, prefix, message) => {
-      if (prefix !== AddonPrefix.GOAL_ITEM) {
-        return;
-      }
-      const goal = parseGoal(message);
-
-      if (!goal) {
-        return;
-      }
-
-      this.addGoal(goal);
-    });
     for (const card of this.cards) {
       card.frame.Hide();
     }
 
-    const visibleGoals = this.goals.filter(
-      (goal) => goal.category === this.selectedCategory,
-    );
+    const visibleGoals = this.getVisibleGoals();
 
     if (visibleGoals.length === 0) {
       this.ui.emptyText.Show();
@@ -201,6 +235,11 @@ export class GoalController {
 
   claimGoal(id: string): void {
     const goal = this.goals.find((goal) => goal.id === id);
+    if (!goal) {
+      print("Goal not found.");
+      return;
+    }
+
     if (!this.isComplete(goal)) {
       print("Goal incomplete.");
       return;

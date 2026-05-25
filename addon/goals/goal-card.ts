@@ -1,12 +1,22 @@
-import { CARD_HEIGHT, CARD_WIDTH, insetBackdrop } from "./goal-style";
+import {
+  CARD_HEIGHT,
+  CARD_WIDTH,
+  REWARD_BUTTON_HEIGHT,
+  REWARD_BUTTON_WIDTH,
+  insetBackdrop,
+} from "./goal-style";
 import type { GoalCard } from "./goal-types";
+
+type BackdropFrame = WoWAPI.Frame & {
+  SetBackdropBorderColor(r: number, g: number, b: number, a: number): void;
+};
 
 export function createGoalCard(index: number, parent: WoWAPI.Frame): GoalCard {
   const card = CreateFrame("Frame", `NikevGoalCard${index}`, parent);
   card.SetSize(CARD_WIDTH, CARD_HEIGHT);
   card.SetBackdrop(insetBackdrop);
   card.SetBackdropColor(0.02, 0.02, 0.02, 0.82);
-  (card as any).SetBackdropBorderColor(0.75, 0.72, 0.64, 1);
+  (card as BackdropFrame).SetBackdropBorderColor(0.75, 0.72, 0.64, 1);
 
   const title = card.CreateFontString(undefined, "OVERLAY", "GameFontNormal");
   title.SetPoint("TOPLEFT", card, "TOPLEFT", 18, -16);
@@ -53,8 +63,8 @@ export function createGoalCard(index: number, parent: WoWAPI.Frame): GoalCard {
     "UIPanelButtonTemplate",
   );
   rewardButton.SetPoint("LEFT", progressBar, "RIGHT", 8, 0);
-  rewardButton.SetSize(120, 28);
-  rewardButton.SetHeight(28);
+  rewardButton.SetSize(REWARD_BUTTON_WIDTH, REWARD_BUTTON_HEIGHT);
+  rewardButton.SetHeight(REWARD_BUTTON_HEIGHT);
 
   return {
     frame: card,
