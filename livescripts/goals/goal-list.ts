@@ -2,14 +2,14 @@ import { AddonPrefix } from "../../shared/prefix";
 import { AccountGoalStore } from "./account-goal-store";
 import { buildGoalPayload } from "./goal-payload-builder";
 
-export const GOAL_KEYS = ["test"] as const;
+export const GOAL_KEYS = ["level-10"] as const;
 export type GoalId = (typeof GOAL_KEYS)[number];
 
 export type ServerGoal = {
   id: GoalId;
   title: string;
   description: string;
-  current: number;
+  current: (player: TSPlayer) => number;
   required: number;
   reward: (player: TSPlayer) => void;
   isCompleted: (player: TSPlayer) => boolean;
@@ -17,19 +17,32 @@ export type ServerGoal = {
 
 const GOAL_LIST: ServerGoal[] = [
   {
-    id: "test",
-    title: "title",
-    description: "description",
-    current: 4,
-    required: 4,
+    id: "level-10",
+    title: "Reach level 10",
+    description:
+      "Reward : 10% experience point bonus for every character on your account.",
+    current: (player: TSPlayer) => player.GetLevel(),
+    required: 10,
     reward(player: TSPlayer) {},
-    isCompleted(player: TSPlayer) {
-      return true;
-    },
+    isCompleted: (player: TSPlayer) => player.GetLevel() >= 10,
   },
 ];
 
 export const GOALS_CONTROLLER = {
+  isGoalId(value: string): value is GoalId {
+    return GOAL_KEYS.includes(value as GoalId);
+  },
+
+  sendGoal(goalId: GoalId, player: TSPlayer) {
+    const goal = GOAL_LIST.find((curr) => curr.id === goalId);
+    if (!goal) {
+      console.log("tried to send invalid goal id");
+      return;
+    }
+    const payload = buildGoalPayload(goal, player);
+    player.SendAddonMessage(AddonPrefix.GOAL_ITEM, payload, 0, player);
+  },
+
   sendList(player: TSPlayer) {
     const accountId = player.GetAccountID();
 
@@ -37,8 +50,7 @@ export const GOALS_CONTROLLER = {
       if (AccountGoalStore.isClaimed(accountId, goal.id)) {
         continue;
       }
-      const payload = buildGoalPayload(goal);
-      player.SendAddonMessage(AddonPrefix.GOAL_ITEM, payload, 0, player);
+      this.sendGoal(goal.id, player);
     }
   },
 

@@ -4,5 +4,5 @@ export type Goal = {
   description: string;
   current: number;
   required: number;
-  claimed?: boolean;
+  claimed: boolean;
 };

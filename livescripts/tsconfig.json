@@ -15,7 +15,7 @@
         "noImplicitSelf": true,
         "luaPlugins": [
             {
-                "name": "C:\\perso\\dev\\tswow-install\\bin\\scripts\\addons\\addons\\LuaORM.js",
+                "name": "D:\\tswow-install\\bin\\scripts\\addons\\addons\\LuaORM.js",
                 "import": "LuaORM"
             }
         ]

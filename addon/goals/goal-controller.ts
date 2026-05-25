@@ -23,18 +23,6 @@ export class GoalController {
     return goal.required <= 0 || goal.current >= goal.required;
   }
 
-  private visibleGoals(): Goal[] {
-    const visible: Goal[] = [];
-
-    for (const goal of this.goals) {
-      if (goal.claimed !== true) {
-        visible.push(goal);
-      }
-    }
-
-    return visible;
-  }
-
   private getCard(index: number): GoalCard {
     if (!this.cards[index]) {
       this.cards[index] = createGoalCard(index + 1, this.ui.scrollChild);
@@ -61,10 +49,10 @@ export class GoalController {
     card.description.SetText(goal.description);
     card.progressBar.SetValue(progress);
     card.progressText.SetText(`${goal.current}/${goal.required}`);
-    card.rewardButton.SetText("Complete");
+    card.rewardButton.SetText(goal.claimed ? "Claimed" : "Complete");
     card.rewardButton.SetScript("OnClick", () => this.claimGoal(goal.id));
 
-    if (complete) {
+    if (complete && !goal.claimed) {
       card.rewardButton.Enable();
       card.progressBar.SetStatusBarColor(0.2, 0.8, 0.35, 1);
     } else {
@@ -94,13 +82,11 @@ export class GoalController {
 
       this.addGoal(goal);
     });
-    const visible = this.visibleGoals();
-
     for (const card of this.cards) {
       card.frame.Hide();
     }
 
-    if (visible.length === 0) {
+    if (this.goals.length === 0) {
       this.ui.emptyText.Show();
       this.ui.scrollFrame.Hide();
       return;
@@ -109,12 +95,13 @@ export class GoalController {
     this.ui.emptyText.Hide();
     this.ui.scrollFrame.Show();
 
-    for (let i = 0; i < visible.length; i++) {
-      this.renderCard(this.getCard(i), visible[i], i);
+    for (let i = 0; i < this.goals.length; i++) {
+      this.renderCard(this.getCard(i), this.goals[i], i);
     }
 
     const height =
-      visible.length * CARD_HEIGHT + Math.max(0, visible.length - 1) * CARD_GAP;
+      this.goals.length * CARD_HEIGHT +
+      Math.max(0, this.goals.length - 1) * CARD_GAP;
     this.ui.scrollChild.SetHeight(height);
     this.ui.scrollFrame.SetVerticalScroll(0);
   }
@@ -125,13 +112,13 @@ export class GoalController {
   }
 
   updateGoal(updatedGoal: Goal): void {
-    let goal = this.goals.find((goal) => goal.id === updatedGoal.id);
+    const index = this.goals.findIndex((curr) => curr.id === updatedGoal.id);
 
-    if (!goal) {
+    if (index === -1) {
+      print("tried to update goal with invalid id");
       return;
     }
-
-    goal = updatedGoal;
+    this.goals[index] = updatedGoal;
 
     this.render();
   }
