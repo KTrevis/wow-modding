@@ -13,4 +13,5 @@ export type GoalsUi = {
   emptyText: WoWAPI.FontString;
   scrollFrame: WoWAPI.ScrollFrame;
   scrollChild: WoWAPI.Frame;
+  tabs: WoWAPI.Button[];
 };

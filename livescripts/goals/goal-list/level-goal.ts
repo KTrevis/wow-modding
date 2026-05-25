@@ -3,6 +3,7 @@ import { ServerGoal } from "./goal-list";
 export function createLevelGoal(level: uint32): ServerGoal {
   return {
     id: `level-${level}`,
+    category: "Leveling",
     title: `Reach level ${level}`,
     description:
       "Reward : 10% experience point bonus for every character on your account.",

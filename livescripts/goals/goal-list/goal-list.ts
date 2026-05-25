@@ -6,6 +6,7 @@ import { createGoalForEveryProfession } from "./profession-goal";
 
 export type ServerGoal = {
   id: string;
+  category: string;
   title: string;
   description: string;
   current: (player: TSPlayer) => number;

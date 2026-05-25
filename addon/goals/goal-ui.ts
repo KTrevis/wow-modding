@@ -51,7 +51,7 @@ export function createGoalsUi(): GoalsUi {
     frame,
   );
   scrollFrame.SetPoint("TOPLEFT", frame, "TOPLEFT", 22, -52);
-  scrollFrame.SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 22);
+  scrollFrame.SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 36);
   scrollFrame.EnableMouseWheel(true);
 
   const scrollChild = CreateFrame(
@@ -69,5 +69,5 @@ export function createGoalsUi(): GoalsUi {
     scrollFrame.SetVerticalScroll(next);
   });
 
-  return { frame, emptyText, scrollFrame, scrollChild };
+  return { frame, emptyText, scrollFrame, scrollChild, tabs: [] };
 }

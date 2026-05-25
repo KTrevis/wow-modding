@@ -6,10 +6,22 @@ import { Goal } from "../../shared/goal/goal.types";
 import { parseGoal } from "./goal-parse";
 import { createGoalCard } from "./goal-card";
 
+declare function PanelTemplates_SetNumTabs(
+  frame: WoWAPI.Frame,
+  numTabs: number,
+): void;
+declare function PanelTemplates_SetTab(frame: WoWAPI.Frame, id: number): void;
+declare function PanelTemplates_TabResize(
+  tab: WoWAPI.Button,
+  padding: number,
+): void;
+
 export class GoalController {
   private goals: Goal[] = [];
   private readonly cards: GoalCard[] = [];
+  private readonly categories: string[] = [];
   private readonly ui = createGoalsUi();
+  private selectedCategory = "";
 
   private clampProgress(goal: Goal): number {
     if (goal.required <= 0) {
@@ -65,6 +77,50 @@ export class GoalController {
     SendAddonMessage(AddonPrefix.GOAL_READY, "", "WHISPER", UnitName("player"));
   }
 
+  private ensureCategory(category: string): void {
+    if (this.categories.indexOf(category) !== -1) {
+      return;
+    }
+
+    const index = this.categories.length;
+    this.categories.push(category);
+
+    const tab = CreateFrame(
+      "Button",
+      `NikevGoalsFrameTab${index + 1}`,
+      this.ui.frame,
+      "CharacterFrameTabButtonTemplate",
+    );
+    tab.SetID(index + 1);
+    tab.SetText(category);
+    PanelTemplates_TabResize(tab, 0);
+    tab.SetScript("OnClick", () => {
+      this.selectedCategory = category;
+      PanelTemplates_SetTab(this.ui.frame, index + 1);
+      this.render();
+    });
+    tab.SetScript("OnShow", () => PanelTemplates_TabResize(tab, 0));
+    if (index === 0) {
+      tab.SetPoint("TOPLEFT", this.ui.frame, "BOTTOMLEFT", 16, 5);
+    } else {
+      tab.SetPoint("LEFT", this.ui.tabs[index - 1], "RIGHT", -16, 0);
+    }
+    this.ui.tabs.push(tab);
+
+    if (this.selectedCategory === "") {
+      this.selectedCategory = category;
+    }
+  }
+
+  private refreshTabs(): void {
+    const selectedIndex = this.categories.indexOf(this.selectedCategory);
+    PanelTemplates_SetNumTabs(this.ui.frame, this.ui.tabs.length);
+
+    if (selectedIndex !== -1) {
+      PanelTemplates_SetTab(this.ui.frame, selectedIndex + 1);
+    }
+  }
+
   addGoal(newGoal: Goal) {
     if (this.goals.some((curr) => curr.id === newGoal.id)) {
       this.updateGoal(newGoal);
@@ -74,6 +130,11 @@ export class GoalController {
   }
 
   render(): void {
+    for (const goal of this.goals) {
+      this.ensureCategory(goal.category);
+    }
+    this.refreshTabs();
+
     this.goals.sort((a, b) => {
       if (a.claimed === b.claimed) {
         return 0;
@@ -97,7 +158,11 @@ export class GoalController {
       card.frame.Hide();
     }
 
-    if (this.goals.length === 0) {
+    const visibleGoals = this.goals.filter(
+      (goal) => goal.category === this.selectedCategory,
+    );
+
+    if (visibleGoals.length === 0) {
       this.ui.emptyText.Show();
       this.ui.scrollFrame.Hide();
       return;
@@ -106,13 +171,13 @@ export class GoalController {
     this.ui.emptyText.Hide();
     this.ui.scrollFrame.Show();
 
-    for (let i = 0; i < this.goals.length; i++) {
-      this.renderCard(this.getCard(i), this.goals[i], i);
+    for (let i = 0; i < visibleGoals.length; i++) {
+      this.renderCard(this.getCard(i), visibleGoals[i], i);
     }
 
     const height =
-      this.goals.length * CARD_HEIGHT +
-      Math.max(0, this.goals.length - 1) * CARD_GAP;
+      visibleGoals.length * CARD_HEIGHT +
+      Math.max(0, visibleGoals.length - 1) * CARD_GAP;
     this.ui.scrollChild.SetHeight(height);
     this.ui.scrollFrame.SetVerticalScroll(0);
   }

@@ -1,5 +1,7 @@
 import { Goal } from "../../shared/goal/goal.types";
 
+const DEFAULT_CATEGORY = "General";
+
 export function parseGoal(payload: string): Goal | null {
   const split = payload.split("|");
 
@@ -12,6 +14,7 @@ export function parseGoal(payload: string): Goal | null {
     description: split[2],
     current: Number(split[3]),
     required: Number(split[4]),
-    claimed: split[5] === "false" ? false : true,
+    claimed: split[5] === "true",
+    category: split[6] || DEFAULT_CATEGORY,
   };
 }
