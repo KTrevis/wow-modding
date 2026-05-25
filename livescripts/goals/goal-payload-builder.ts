@@ -1,5 +1,5 @@
 import { AccountGoalStore } from "./account-goal-store";
-import { ServerGoal } from "./goal-list";
+import { ServerGoal } from "./goal-list/goal-list";
 
 export function buildGoalPayload(goal: ServerGoal, player: TSPlayer) {
   const isClaimed = AccountGoalStore.isClaimed(player.GetAccountID(), goal.id);

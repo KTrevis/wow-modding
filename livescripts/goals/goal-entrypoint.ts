@@ -1,21 +1,48 @@
 import { AddonPrefix } from "../../shared/prefix";
-import { GOALS_CONTROLLER } from "./goal-list";
+import { GOALS_CONTROLLER } from "./goal-list/goal-list";
+
+const ADDON_PREFIXES = [
+  AddonPrefix.GOAL_CLAIM,
+  AddonPrefix.GOAL_ITEM,
+  AddonPrefix.GOAL_READY,
+];
+
+function getAddonMessagePrefix(message: string): AddonPrefix | undefined {
+  return ADDON_PREFIXES.find(
+    (prefix) => message === prefix || message.startsWith(`${prefix}\t`),
+  );
+}
 
 function getAddonMessageBody(
   message: string,
   prefix: AddonPrefix,
 ): string | undefined {
-  if (!message.startsWith(prefix)) {
+  if (getAddonMessagePrefix(message) !== prefix) {
     return undefined;
   }
 
   return message.substring(prefix.length + 1, message.length);
 }
 
+function handleGoalClaim(player: TSPlayer, message: string): void {
+  const id = getAddonMessageBody(message, AddonPrefix.GOAL_CLAIM);
+
+  if (id === undefined) {
+    return;
+  }
+
+  if (!GOALS_CONTROLLER.isCompleted(player, id)) {
+    return;
+  }
+
+  GOALS_CONTROLLER.claim(player, id);
+}
+
 export function goalEntrypoint(events: TSEvents) {
-  events.Player.OnLevelChanged((player) =>
-    GOALS_CONTROLLER.sendGoal("level-10", player),
-  );
+  events.Player.OnLevelChanged((player) => {
+    GOALS_CONTROLLER.sendGoal("level-10", player);
+    GOALS_CONTROLLER.sendGoal("level-20", player);
+  });
 
   events.Player.OnSay((player) => {
     GOALS_CONTROLLER.sendList(player);
@@ -26,16 +53,16 @@ export function goalEntrypoint(events: TSEvents) {
       return;
     }
 
-    const id = getAddonMessageBody(message.get(), AddonPrefix.GOAL_CLAIM);
+    const addonMessage = message.get();
+    const prefix = getAddonMessagePrefix(addonMessage);
 
-    if (id === undefined || !GOALS_CONTROLLER.isGoalId(id)) {
-      return;
+    switch (prefix) {
+      case AddonPrefix.GOAL_READY:
+        GOALS_CONTROLLER.sendList(sender);
+        break;
+      case AddonPrefix.GOAL_CLAIM:
+        handleGoalClaim(sender, addonMessage);
+        break;
     }
-
-    if (!GOALS_CONTROLLER.isCompleted(sender, id)) {
-      return;
-    }
-
-    GOALS_CONTROLLER.claim(sender, id);
   });
 }

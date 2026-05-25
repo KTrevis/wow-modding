@@ -1,7 +1,5 @@
-import type { GoalId } from "./goal-list";
-
 export type AccountGoalRecord = {
-  goal: GoalId;
+  goal: string;
   completed: boolean;
   claimed: boolean;
 };
@@ -19,7 +17,7 @@ export class AccountGoalStore {
       `);
   }
 
-  static add(accountId: uint32, goal: GoalId): void {
+  static add(accountId: uint32, goal: string): void {
     PrepareCharactersQuery(
       `INSERT IGNORE INTO account_goals (accountId, goal) VALUES (?, ?)`,
     )
@@ -29,7 +27,7 @@ export class AccountGoalStore {
       .Send();
   }
 
-  static claim(accountId: uint32, goal: GoalId): void {
+  static claim(accountId: uint32, goal: string): void {
     PrepareCharactersQuery(
       `INSERT INTO account_goals (accountId, goal, claimedAt)
        VALUES (?, ?, UNIX_TIMESTAMP())
@@ -42,7 +40,7 @@ export class AccountGoalStore {
       .Send();
   }
 
-  static isClaimed(accountId: uint32, goal: GoalId): boolean {
+  static isClaimed(accountId: uint32, goal: string): boolean {
     const result = PrepareCharactersQuery(
       `SELECT 1 FROM account_goals
        WHERE accountId = ? AND goal = ? AND claimedAt IS NOT NULL
@@ -71,7 +69,7 @@ export class AccountGoalStore {
 
     while (result.GetRow()) {
       records.push({
-        goal: result.GetString(0) as GoalId,
+        goal: result.GetString(0),
         completed: result.GetUInt8(1) !== 0,
         claimed: result.GetUInt8(1) !== 0,
       });

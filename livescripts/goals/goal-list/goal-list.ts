@@ -1,12 +1,11 @@
-import { AddonPrefix } from "../../shared/prefix";
-import { AccountGoalStore } from "./account-goal-store";
-import { buildGoalPayload } from "./goal-payload-builder";
-
-export const GOAL_KEYS = ["level-10"] as const;
-export type GoalId = (typeof GOAL_KEYS)[number];
+import { AddonPrefix } from "../../../shared/prefix";
+import { AccountGoalStore } from "../account-goal-store";
+import { buildGoalPayload } from "../goal-payload-builder";
+import { createLevelGoal } from "./level-goal";
+import { createGoalForEveryProfession } from "./profession-goal";
 
 export type ServerGoal = {
-  id: GoalId;
+  id: string;
   title: string;
   description: string;
   current: (player: TSPlayer) => number;
@@ -16,24 +15,15 @@ export type ServerGoal = {
 };
 
 const GOAL_LIST: ServerGoal[] = [
-  {
-    id: "level-10",
-    title: "Reach level 10",
-    description:
-      "Reward : 10% experience point bonus for every character on your account.",
-    current: (player: TSPlayer) => player.GetLevel(),
-    required: 10,
-    reward(player: TSPlayer) {},
-    isCompleted: (player: TSPlayer) => player.GetLevel() >= 10,
-  },
+  createLevelGoal(10),
+  createLevelGoal(20),
+  ...createGoalForEveryProfession(75),
 ];
 
-export const GOALS_CONTROLLER = {
-  isGoalId(value: string): value is GoalId {
-    return GOAL_KEYS.includes(value as GoalId);
-  },
+createGoalForEveryProfession(75);
 
-  sendGoal(goalId: GoalId, player: TSPlayer) {
+export const GOALS_CONTROLLER = {
+  sendGoal(goalId: string, player: TSPlayer) {
     const goal = GOAL_LIST.find((curr) => curr.id === goalId);
     if (!goal) {
       console.log("tried to send invalid goal id");
@@ -44,17 +34,12 @@ export const GOALS_CONTROLLER = {
   },
 
   sendList(player: TSPlayer) {
-    const accountId = player.GetAccountID();
-
     for (const goal of GOAL_LIST) {
-      if (AccountGoalStore.isClaimed(accountId, goal.id)) {
-        continue;
-      }
       this.sendGoal(goal.id, player);
     }
   },
 
-  claim(player: TSPlayer, goalId: GoalId) {
+  claim(player: TSPlayer, goalId: string) {
     const goal = GOAL_LIST.find((goal) => goal.id === goalId);
 
     if (goal === undefined) {
@@ -72,7 +57,7 @@ export const GOALS_CONTROLLER = {
     this.sendList(player);
   },
 
-  isCompleted(player: TSPlayer, id: GoalId): boolean {
+  isCompleted(player: TSPlayer, id: string): boolean {
     const goal = GOAL_LIST.find((goal) => goal.id === id);
 
     if (!goal) {

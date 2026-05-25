@@ -61,15 +61,26 @@ export class GoalController {
     }
   }
 
+  private requestGoals(): void {
+    SendAddonMessage(AddonPrefix.GOAL_READY, "", "WHISPER", UnitName("player"));
+  }
+
   addGoal(newGoal: Goal) {
     if (this.goals.some((curr) => curr.id === newGoal.id)) {
       this.updateGoal(newGoal);
-      return;
+    } else {
+      this.setGoals([...this.goals, newGoal]);
     }
-    this.setGoals([...this.goals, newGoal]);
   }
 
   render(): void {
+    this.goals.sort((a, b) => {
+      if (a.claimed === b.claimed) {
+        return 0;
+      }
+
+      return a.claimed ? 1 : -1;
+    });
     this.ui.frame.SetScript("OnEvent", (_self, _event, prefix, message) => {
       if (prefix !== AddonPrefix.GOAL_ITEM) {
         return;
@@ -142,6 +153,7 @@ export class GoalController {
   }
 
   show(): void {
+    this.requestGoals();
     this.render();
     this.ui.frame.Show();
   }
