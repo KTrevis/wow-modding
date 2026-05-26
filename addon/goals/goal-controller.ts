@@ -155,7 +155,7 @@ export class GoalController {
   private sortGoals(goals: Goal[]): Goal[] {
     return [...goals].sort((a, b) => {
       if (a.claimed === b.claimed) {
-        return 0;
+        return this.clampProgress(b) - this.clampProgress(a);
       }
 
       return a.claimed ? 1 : -1;
