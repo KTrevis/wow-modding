@@ -26,7 +26,7 @@ function createProfessionGoal(key: ProfessionKey, level: number): ServerGoal {
     id: `profession-${key}`,
     category: "Professions",
     title: `Reach level ${level} in ${key}`,
-    description: `Reach level ${level} in ${key} to unlock one talent point.`,
+    description: `Reward : Every character on your account will start at level ${level} in ${key}.`,
     current: (player: TSPlayer) => player.GetSkillValue(professionId),
     required: level,
     isCompleted: (player) => player.GetSkillValue(professionId) >= level,
