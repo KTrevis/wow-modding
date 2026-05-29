@@ -1,3 +1,4 @@
+import { AccountGoalStore } from "../account-goal-store";
 import { ServerGoal } from "./goal-list";
 
 const PROFESSIONS = {
@@ -30,9 +31,10 @@ function createProfessionGoal(key: ProfessionKey, level: number): ServerGoal {
     current: (player: TSPlayer) => player.GetSkillValue(professionId),
     required: level,
     isCompleted: (player) => player.GetSkillValue(professionId) >= level,
-    reward: (player) => {
-      const skillLevel = player.GetSkillValue(professionId);
-      console.log(skillLevel);
+    reward(player) {
+      if (AccountGoalStore.isClaimed(player.GetAccountID(), this.id)) {
+        player.SetSkill(professionId, 1, 75, 150);
+      }
     },
   };
 }

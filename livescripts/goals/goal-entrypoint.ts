@@ -40,9 +40,11 @@ function handleGoalClaim(player: TSPlayer, message: string): void {
 
 export function goalEntrypoint(events: TSEvents) {
   events.Player.OnLogin((player) => {
-    for (const goal of GOAL_LIST) {
-      goal.reward(player);
-    }
+    player.AddNamedTimer("login-timer", 100, 1, 0, () => {
+      for (const goal of GOAL_LIST) {
+        goal.reward(player);
+      }
+    });
   });
 
   events.Player.OnWhisper((sender, receiver, message) => {
