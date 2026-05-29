@@ -30,7 +30,10 @@ function createProfessionGoal(key: ProfessionKey, level: number): ServerGoal {
     current: (player: TSPlayer) => player.GetSkillValue(professionId),
     required: level,
     isCompleted: (player) => player.GetSkillValue(professionId) >= level,
-    reward: (player) => {},
+    reward: (player) => {
+      const skillLevel = player.GetSkillValue(professionId);
+      console.log(skillLevel);
+    },
   };
 }
 

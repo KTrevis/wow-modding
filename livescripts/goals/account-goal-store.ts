@@ -17,16 +17,6 @@ export class AccountGoalStore {
       `);
   }
 
-  static add(accountId: uint32, goal: string): void {
-    PrepareCharactersQuery(
-      `INSERT IGNORE INTO account_goals (accountId, goal) VALUES (?, ?)`,
-    )
-      .Create()
-      .SetUInt32(0, accountId)
-      .SetString(1, goal)
-      .Send();
-  }
-
   static claim(accountId: uint32, goal: string): void {
     PrepareCharactersQuery(
       `INSERT INTO account_goals (accountId, goal, claimedAt)
@@ -54,7 +44,7 @@ export class AccountGoalStore {
     return result.GetRow();
   }
 
-  static list(accountId: uint32): AccountGoalRecord[] {
+  static listWithPrefix(accountId: uint32, prefix: string) {
     const result = PrepareCharactersQuery(
       `SELECT goal, claimedAt IS NOT NULL
        FROM account_goals

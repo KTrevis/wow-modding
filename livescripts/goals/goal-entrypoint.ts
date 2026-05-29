@@ -1,5 +1,5 @@
 import { AddonPrefix } from "../../shared/prefix";
-import { GOALS_CONTROLLER } from "./goal-list/goal-list";
+import { GOAL_LIST, GOALS_CONTROLLER } from "./goal-list/goal-list";
 
 const ADDON_PREFIXES = [
   AddonPrefix.GOAL_CLAIM,
@@ -39,13 +39,10 @@ function handleGoalClaim(player: TSPlayer, message: string): void {
 }
 
 export function goalEntrypoint(events: TSEvents) {
-  events.Player.OnLevelChanged((player) => {
-    GOALS_CONTROLLER.sendGoal("level-10", player);
-    GOALS_CONTROLLER.sendGoal("level-20", player);
-  });
-
-  events.Player.OnSay((player) => {
-    GOALS_CONTROLLER.sendList(player);
+  events.Player.OnLogin((player) => {
+    for (const goal of GOAL_LIST) {
+      goal.reward(player);
+    }
   });
 
   events.Player.OnWhisper((sender, receiver, message) => {

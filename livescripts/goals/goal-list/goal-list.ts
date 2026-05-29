@@ -15,7 +15,7 @@ export type ServerGoal = {
   isCompleted: (player: TSPlayer) => boolean;
 };
 
-const GOAL_LIST: ServerGoal[] = [
+export const GOAL_LIST: ServerGoal[] = [
   createLevelGoal(10),
   createLevelGoal(20),
   ...createGoalForEveryProfession(75),
