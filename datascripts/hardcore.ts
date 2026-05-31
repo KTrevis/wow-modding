@@ -27,3 +27,7 @@ const HARDCORE_AURA = std.Spells.create(MODULE_NAME, "hardcore-aura")
       player.AddAura(HARDCORE_AURA, player);
     });
   });
+
+std.InlineScripts.Player.OnLogin((player) =>
+  player.AddAura(UTAG("nikev", "hardcore-aura"), player),
+);

@@ -1,4 +1,4 @@
-import { UTAGS } from "../utags";
+import { UTAGS } from "../utils/utags";
 
 const AURAS_TO_REMOVE_ON_LOGOUT = [UTAGS.PERCENT_XP_BUFF_10];
 

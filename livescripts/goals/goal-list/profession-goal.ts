@@ -32,8 +32,11 @@ function createProfessionGoal(key: ProfessionKey, level: number): ServerGoal {
     required: level,
     isCompleted: (player) => player.GetSkillValue(professionId) >= level,
     reward(player) {
-      if (AccountGoalStore.isClaimed(player.GetAccountID(), this.id)) {
-        player.SetSkill(professionId, 1, 75, 150);
+      if (
+        AccountGoalStore.isClaimed(player.GetAccountID(), this.id) &&
+        player.GetSkillValue(professionId) < level
+      ) {
+        player.SetSkill(professionId, 1, level, level);
       }
     },
   };

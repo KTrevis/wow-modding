@@ -1,4 +1,5 @@
-import { UTAGS } from "../../utags";
+import { ONE_GOLD } from "../../utils/money.constants";
+import { UTAGS } from "../../utils/utags";
 import { AccountGoalStore } from "../account-goal-store";
 import { ServerGoal } from "./goal-list";
 
@@ -7,8 +8,7 @@ export function createLevelGoal(level: uint32): ServerGoal {
     id: `level-${level}`,
     category: "Leveling",
     title: `Reach level ${level}`,
-    description:
-      "Reward : 10% experience point bonus for every character on your account.",
+    description: "Reward : 1 gold.",
     current: (player: TSPlayer) => player.GetLevel(),
     required: level,
     reward(player: TSPlayer) {

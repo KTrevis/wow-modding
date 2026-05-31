@@ -20,6 +20,7 @@ export function createGoalsUi(): GoalsUi {
   frame.SetScript("OnDragStop", () => frame.StopMovingOrSizing());
   frame.Hide();
   frame.RegisterEvent("CHAT_MSG_ADDON");
+  UISpecialFrames.push("NikevGoalsFrame");
 
   const header = frame.CreateFontString(
     undefined,
@@ -28,6 +29,17 @@ export function createGoalsUi(): GoalsUi {
   );
   header.SetPoint("TOPLEFT", frame, "TOPLEFT", 24, -18);
   header.SetText("Goals");
+
+  const backButton = CreateFrame(
+    "Button",
+    undefined,
+    frame,
+    "UIPanelButtonTemplate",
+  );
+  backButton.SetPoint("TOPRIGHT", frame, "TOPRIGHT", -42, -16);
+  backButton.SetSize(70, 24);
+  backButton.SetText("Back");
+  backButton.Hide();
 
   const closeButton = CreateFrame(
     "Button",
@@ -70,5 +82,5 @@ export function createGoalsUi(): GoalsUi {
     scrollFrame.SetVerticalScroll(next);
   });
 
-  return { frame, emptyText, scrollFrame, scrollChild, tabs: [] };
+  return { frame, header, backButton, emptyText, scrollFrame, scrollChild };
 }
