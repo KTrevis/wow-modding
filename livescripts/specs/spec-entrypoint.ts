@@ -2,7 +2,7 @@ import { AddonPrefix } from "../../shared/prefix";
 import {
   parseActionBarSlotPayload,
   type SpecActionBarSlot,
-} from "../../shared/specs/actionbar.types";
+} from "../../shared/specs/actionbar-types";
 import { SPECS_CONTROLLER } from "./spec-controller";
 
 type PendingSpecSwitch = {

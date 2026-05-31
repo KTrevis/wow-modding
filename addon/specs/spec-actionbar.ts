@@ -3,7 +3,7 @@ import {
   buildActionBarSlotPayload,
   isSpecActionType,
   type SpecActionBarSlot,
-} from "../../shared/specs/actionbar.types";
+} from "../../shared/specs/actionbar-types";
 
 const FIRST_ACTION_SLOT = 1;
 const LAST_ACTION_SLOT = 120;
@@ -19,7 +19,7 @@ function getSpellIdFromActionSlot(slot: number): number | undefined {
   spellTooltip.ClearLines();
   spellTooltip.SetAction(slot as ActionBarSlotId);
 
-  const [_name, spellId] = spellTooltip.GetSpell();
+  const [_name, _rank, spellId] = spellTooltip.GetSpell();
   spellTooltip.Hide();
 
   return Number(spellId);

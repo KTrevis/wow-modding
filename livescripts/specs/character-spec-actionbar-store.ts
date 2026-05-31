@@ -1,4 +1,4 @@
-import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
+import type { SpecActionBarSlot } from "../../shared/specs/actionbar-types";
 
 export class CharacterSpecActionBarStore {
   static ensureTable(): void {

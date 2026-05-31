@@ -2,7 +2,7 @@ import { AddonPrefix } from "../../shared/prefix";
 import {
   buildActionBarSlotPayload,
   type SpecActionBarSlot,
-} from "../../shared/specs/actionbar.types";
+} from "../../shared/specs/actionbar-types";
 import { CharacterSpecActionBarStore } from "./character-spec-actionbar-store";
 import { CharacterSpecStore } from "./character-spec-store";
 import { buildSpecPayload } from "./spec-payload-builder";
