@@ -59,28 +59,23 @@ export const SPECS_CONTROLLER = {
   learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId: string) {
     const classId = player.GetClass() as Class;
     const specs = CLASSES_SPECS[classId] || [];
-    const newSpec = specs.find(
-      (curr) => curr.id === newSpecId,
-    );
-    const oldSpec = specs.find(
-      (curr) => curr.id === oldSpecId,
-    );
+    const newSpec = specs.find((curr) => curr.id === newSpecId);
+    const oldSpec = specs.find((curr) => curr.id === oldSpecId);
 
     if (!newSpec) {
       console.log("newSpec undefined");
       return;
     }
-    if (!oldSpec) {
-      console.log("oldSpec undefined");
-      return;
-    }
 
-    for (const level in oldSpec.spells) {
-      const spells = oldSpec.spells[Number(level)];
+    if (oldSpec) {
+      for (const level in oldSpec.spells) {
+        const spells = oldSpec.spells[Number(level)];
 
-      for (const curr of spells) {
-        player.RemoveSpell(curr, false, false);
+        for (const curr of spells) {
+          player.RemoveSpell(curr, false, false);
+        }
       }
+      return;
     }
 
     for (const level in newSpec.spells) {
