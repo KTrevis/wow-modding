@@ -9,7 +9,9 @@ export const CLASSES_SPECS: Record<number, Spec[]> = {
     {
       id: "arms",
       name: "Arms",
-      spells: {},
+      spells: {
+        1: [2136],
+      },
     },
     {
       id: "fury",

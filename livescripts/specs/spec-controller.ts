@@ -49,7 +49,41 @@ export const SPECS_CONTROLLER = {
     CharacterSpecStore.save(characterId, spec.id);
 
     if (currentSpecId !== spec.id) {
+      this.learnSpecSpells(player, specId, currentSpecId);
       this.sendActionBar(player, spec.id);
+    }
+  },
+
+  learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId: string) {
+    const classId = player.GetClass();
+    const newSpec = CLASSES_SPECS[classId].find(
+      (curr) => curr.id === newSpecId,
+    );
+    const oldSpec = CLASSES_SPECS[classId].find(
+      (curr) => curr.id === oldSpecId,
+    );
+
+    if (!newSpec) {
+      console.log("newSpec undefined");
+      return;
+    }
+    if (!oldSpec) {
+      console.log("oldSpec undefined");
+      return;
+    }
+
+    for (const [_, spells] of Object.entries(oldSpec.spells)) {
+      for (const curr of spells) {
+        player.RemoveSpell(curr, false, false);
+      }
+    }
+
+    for (const [level, spells] of Object.entries(newSpec.spells)) {
+      if (player.GetLevel() >= Number(level)) {
+        for (const curr of spells) {
+          player.LearnSpell(curr);
+        }
+      }
     }
   },
 
