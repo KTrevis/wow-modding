@@ -1,6 +1,3 @@
-import { AddonPrefix } from "../../../shared/prefix";
-import { AccountGoalStore } from "../account-goal-store";
-import { buildGoalPayload } from "../goal-payload-builder";
 import { createLevelGoal } from "./level-goal";
 import { createGoalForEveryProfession } from "./profession-goal";
 
@@ -11,7 +8,7 @@ export type ServerGoal = {
   description: string;
   current: (player: TSPlayer) => number;
   required: number;
-  reward: (player: TSPlayer) => void;
+  reward: (player: TSPlayer, firstLogin?: boolean) => void;
   isCompleted: (player: TSPlayer) => boolean;
 };
 

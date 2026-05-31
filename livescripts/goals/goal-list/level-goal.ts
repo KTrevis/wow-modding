@@ -1,4 +1,4 @@
-import { ONE_GOLD } from "../../utils/money.constants";
+import { ONE_GOLD } from "../../utils/money";
 import { UTAGS } from "../../utils/utags";
 import { AccountGoalStore } from "../account-goal-store";
 import { ServerGoal } from "./goal-list";
@@ -8,12 +8,16 @@ export function createLevelGoal(level: uint32): ServerGoal {
     id: `level-${level}`,
     category: "Leveling",
     title: `Reach level ${level}`,
-    description: "Reward : 1 gold.",
+    description:
+      "Reward : future characters will start with 1 gold. This effect is stackable.",
     current: (player: TSPlayer) => player.GetLevel(),
     required: level,
-    reward(player: TSPlayer) {
-      if (AccountGoalStore.isClaimed(player.GetAccountID(), this.id)) {
-        player.CastSpell(player, UTAGS.PERCENT_XP_BUFF_10, true);
+    reward(player: TSPlayer, firstLogin = false) {
+      if (
+        AccountGoalStore.isClaimed(player.GetAccountID(), this.id) &&
+        firstLogin
+      ) {
+        player.TryAddMoney(ONE_GOLD);
       }
     },
     isCompleted: (player: TSPlayer) => player.GetLevel() >= level,
