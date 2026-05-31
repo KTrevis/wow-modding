@@ -1,5 +1,6 @@
 import { AddonPrefix } from "../../shared/prefix";
-import { GOAL_LIST, GOALS_CONTROLLER } from "./goal-list/goal-list";
+import { GOALS_CONTROLLER } from "./goal-list/goal-controller";
+import { GOAL_LIST } from "./goal-list/goal-list";
 
 const ADDON_PREFIXES = [
   AddonPrefix.GOAL_CLAIM,
