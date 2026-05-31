@@ -1,5 +1,6 @@
 import { GoalController } from "./goals/goal-controller";
 import { SpecController } from "./specs/spec-controller";
+import { replaceTalentMicroButton } from "./specs/spec-micro-button";
 
 const goalController = new GoalController();
 const specController = new SpecController();
@@ -32,5 +33,7 @@ _G.SlashCmdList.NIKEVGOALS = () => goalController.toggle();
 
 _G.SLASH_NIKEVSPECS1 = "/specs";
 _G.SlashCmdList.NIKEVSPECS = () => specController.toggle();
+
+replaceTalentMicroButton(specController);
 
 goalController.render();

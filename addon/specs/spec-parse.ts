@@ -11,9 +11,10 @@ export function parseSpecs(payload: string): ClientSpec[] {
     const split = entry.split("|");
     const id = split[0];
     const name = split[1];
+    const active = split[2] === "true";
 
     if (id !== "" && name !== undefined && name !== "") {
-      specs.push({ id, name });
+      specs.push({ id, name, active });
     }
   }
 

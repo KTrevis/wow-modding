@@ -47,6 +47,15 @@ export class SpecController {
 
   private switchSpec(spec: ClientSpec): void {
     sendActionBarSnapshot(spec.id);
+    this.setActiveSpec(spec.id);
+  }
+
+  private setActiveSpec(specId: string): void {
+    for (const spec of this.specs) {
+      spec.active = spec.id === specId;
+    }
+
+    this.render();
   }
 
   private beginActionBarLoad(): void {
@@ -113,8 +122,13 @@ export class SpecController {
       const button = this.getButton(i);
 
       positionSpecButton(button, this.ui.buttonParent, i);
-      button.SetText(spec.name);
+      button.SetText(spec.active ? `${spec.name} (Active)` : spec.name);
       button.SetScript("OnClick", () => this.switchSpec(spec));
+      if (spec.active) {
+        button.LockHighlight();
+      } else {
+        button.UnlockHighlight();
+      }
       button.Show();
     }
 

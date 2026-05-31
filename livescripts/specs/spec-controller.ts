@@ -10,10 +10,12 @@ import { CLASSES_SPECS } from "./spec-list";
 
 export const SPECS_CONTROLLER = {
   sendList(player: TSPlayer): void {
-    const specs = CLASSES_SPECS[player.GetClass()] || [];
+    const specs = CLASSES_SPECS[player.GetClass() as Class] || [];
+    const activeSpecId = CharacterSpecStore.get(player.GetGUIDLow());
+
     player.SendAddonMessage(
       AddonPrefix.SPECS_LIST,
-      buildSpecPayload(specs),
+      buildSpecPayload(specs, activeSpecId),
       0,
       player,
     );
@@ -24,7 +26,7 @@ export const SPECS_CONTROLLER = {
     specId: string,
     actionBarSlots: SpecActionBarSlot[],
   ): void {
-    const specs = CLASSES_SPECS[player.GetClass()] || [];
+    const specs = CLASSES_SPECS[player.GetClass() as Class] || [];
     const spec = specs.find((curr) => curr.id === specId);
 
     if (spec === undefined) {
@@ -55,11 +57,12 @@ export const SPECS_CONTROLLER = {
   },
 
   learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId: string) {
-    const classId = player.GetClass();
-    const newSpec = CLASSES_SPECS[classId].find(
+    const classId = player.GetClass() as Class;
+    const specs = CLASSES_SPECS[classId] || [];
+    const newSpec = specs.find(
       (curr) => curr.id === newSpecId,
     );
-    const oldSpec = CLASSES_SPECS[classId].find(
+    const oldSpec = specs.find(
       (curr) => curr.id === oldSpecId,
     );
 
@@ -72,14 +75,18 @@ export const SPECS_CONTROLLER = {
       return;
     }
 
-    for (const [_, spells] of Object.entries(oldSpec.spells)) {
+    for (const level in oldSpec.spells) {
+      const spells = oldSpec.spells[Number(level)];
+
       for (const curr of spells) {
         player.RemoveSpell(curr, false, false);
       }
     }
 
-    for (const [level, spells] of Object.entries(newSpec.spells)) {
+    for (const level in newSpec.spells) {
       if (player.GetLevel() >= Number(level)) {
+        const spells = newSpec.spells[Number(level)];
+
         for (const curr of spells) {
           player.LearnSpell(curr);
         }

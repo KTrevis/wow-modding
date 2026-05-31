@@ -27,9 +27,13 @@ export function createSpecsUi(): SpecsUi {
   frame.Hide();
   UISpecialFrames.push("NikevSpecsFrame");
 
-  const title = frame.CreateFontString(undefined, "OVERLAY", "GameFontNormalLarge");
+  const title = frame.CreateFontString(
+    undefined,
+    "OVERLAY",
+    "GameFontNormalLarge",
+  );
   title.SetPoint("TOP", frame, "TOP", 0, -20);
-  title.SetText("Specs");
+  title.SetText("Specializations");
 
   const closeButton = CreateFrame(
     "Button",

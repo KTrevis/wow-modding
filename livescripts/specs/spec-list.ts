@@ -1,10 +1,12 @@
+export type SpecId = "arms" | "fury" | "prot";
+
 export type Spec = {
-  id: string;
-  name: string;
-  spells: Record<number, number[]>;
+  readonly id: SpecId;
+  readonly name: string;
+  readonly spells: Record<number, readonly number[]>;
 }; // number: requiredLevel, number[]: spellIds
 
-export const CLASSES_SPECS: Record<number, Spec[]> = {
+export const CLASSES_SPECS: Record<Class, readonly Spec[]> = {
   [Class.WARRIOR]: [
     {
       id: "arms",
@@ -24,4 +26,13 @@ export const CLASSES_SPECS: Record<number, Spec[]> = {
       spells: {},
     },
   ],
+  [Class.DEATH_KNIGHT]: [],
+  [Class.DRUID]: [],
+  [Class.HUNTER]: [],
+  [Class.MAGE]: [],
+  [Class.PALADIN]: [],
+  [Class.PRIEST]: [],
+  [Class.ROGUE]: [],
+  [Class.SHAMAN]: [],
+  [Class.WARLOCK]: [],
 };
