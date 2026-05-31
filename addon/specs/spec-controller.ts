@@ -1,9 +1,11 @@
 import { AddonPrefix } from "../../shared/prefix";
-import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
+import {
+  parseActionBarSlotPayload,
+  type SpecActionBarSlot,
+} from "../../shared/specs/actionbar.types";
 import type { ClientSpec } from "../../shared/specs/spec.types";
 import {
   clearActionBar,
-  parseActionBarSlotPayload,
   placeActionBarSlot,
   sendActionBarSnapshot,
 } from "./spec-actionbar";

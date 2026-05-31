@@ -9,7 +9,6 @@ import {
 
 export type SpecsUi = {
   frame: WoWAPI.Frame;
-  title: WoWAPI.FontString;
   emptyText: WoWAPI.FontString;
   buttonParent: WoWAPI.Frame;
 };
@@ -53,7 +52,7 @@ export function createSpecsUi(): SpecsUi {
   buttonParent.SetSize(SPEC_BUTTON_WIDTH, SPEC_WINDOW_HEIGHT - 70);
   buttonParent.SetPoint("TOP", title, "BOTTOM", 0, -18);
 
-  return { frame, title, emptyText, buttonParent };
+  return { frame, emptyText, buttonParent };
 }
 
 export function positionSpecButton(

@@ -1,8 +1,5 @@
 import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
 
-const SAVED_SET_MARKER_SLOT = 0;
-const SAVED_SET_MARKER_TYPE = "saved";
-
 export class CharacterSpecActionBarStore {
   static ensureTable(): void {
     QueryCharacters(`
@@ -31,18 +28,6 @@ export class CharacterSpecActionBarStore {
       .SetString(1, specId)
       .Send();
 
-    PrepareCharactersQuery(
-      `INSERT INTO character_spec_actionbars (characterId, specId, slot, actionType, actionId)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-      .Create()
-      .SetUInt32(0, characterId)
-      .SetString(1, specId)
-      .SetUInt16(2, SAVED_SET_MARKER_SLOT)
-      .SetString(3, SAVED_SET_MARKER_TYPE)
-      .SetUInt32(4, 0)
-      .Send();
-
     for (const slot of slots) {
       PrepareCharactersQuery(
         `INSERT INTO character_spec_actionbars (characterId, specId, slot, actionType, actionId)
@@ -58,32 +43,16 @@ export class CharacterSpecActionBarStore {
     }
   }
 
-  static hasSavedSet(characterId: uint32, specId: string): boolean {
-    const result = PrepareCharactersQuery(
-      `SELECT 1 FROM character_spec_actionbars
-       WHERE characterId = ? AND specId = ? AND slot = ?
-       LIMIT 1`,
-    )
-      .Create()
-      .SetUInt32(0, characterId)
-      .SetString(1, specId)
-      .SetUInt16(2, SAVED_SET_MARKER_SLOT)
-      .Send();
-
-    return result.GetRow();
-  }
-
   static load(characterId: uint32, specId: string): SpecActionBarSlot[] {
     const result = PrepareCharactersQuery(
       `SELECT slot, actionType, actionId
        FROM character_spec_actionbars
-       WHERE characterId = ? AND specId = ? AND slot <> ?
+       WHERE characterId = ? AND specId = ?
        ORDER BY slot`,
     )
       .Create()
       .SetUInt32(0, characterId)
       .SetString(1, specId)
-      .SetUInt16(2, SAVED_SET_MARKER_SLOT)
       .Send();
 
     const slots: SpecActionBarSlot[] = [];

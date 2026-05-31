@@ -1,5 +1,8 @@
 import { AddonPrefix } from "../../shared/prefix";
-import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
+import {
+  parseActionBarSlotPayload,
+  type SpecActionBarSlot,
+} from "../../shared/specs/actionbar.types";
 import { SPECS_CONTROLLER } from "./spec-controller";
 
 type PendingSpecSwitch = {
@@ -9,10 +12,16 @@ type PendingSpecSwitch = {
 
 const pendingSwitches: Record<number, PendingSpecSwitch> = {};
 
-function isSpecsReadyMessage(message: string): boolean {
-  return (
-    message === AddonPrefix.SPECS_READY ||
-    message.startsWith(`${AddonPrefix.SPECS_READY}\t`)
+const ADDON_PREFIXES = [
+  AddonPrefix.SPECS_READY,
+  AddonPrefix.SWITCH_SPEC,
+  AddonPrefix.SPEC_BAR_SLOT,
+  AddonPrefix.SPEC_BAR_DONE,
+];
+
+function getAddonMessagePrefix(message: string): AddonPrefix | undefined {
+  return ADDON_PREFIXES.find(
+    (prefix) => message === prefix || message.startsWith(`${prefix}\t`),
   );
 }
 
@@ -20,32 +29,11 @@ function getAddonMessageBody(
   message: string,
   prefix: AddonPrefix,
 ): string | undefined {
-  if (message === prefix) {
-    return "";
-  }
-
-  if (!message.startsWith(`${prefix}\t`)) {
+  if (getAddonMessagePrefix(message) !== prefix) {
     return undefined;
   }
 
   return message.substring(prefix.length + 1, message.length);
-}
-
-function parseActionBarSlot(payload: string): SpecActionBarSlot | undefined {
-  const split = payload.split("|");
-  const slot = Number(split[0]);
-  const actionType = split[1] as SpecActionBarSlot["actionType"];
-  const actionId = Number(split[2]);
-
-  if (
-    slot !== slot ||
-    actionId !== actionId ||
-    (actionType !== "spell" && actionType !== "item" && actionType !== "macro")
-  ) {
-    return undefined;
-  }
-
-  return { slot, actionType, actionId };
 }
 
 function beginSpecSwitch(player: TSPlayer, specId: string): void {
@@ -59,7 +47,7 @@ function addActionBarSlot(player: TSPlayer, payload: string): void {
     return;
   }
 
-  const slot = parseActionBarSlot(payload);
+  const slot = parseActionBarSlotPayload(payload);
 
   if (slot !== undefined) {
     pending.actionBarSlots.push(slot);
@@ -85,28 +73,27 @@ export function specEntrypoint(events: TSEvents): void {
     }
 
     const addonMessage = message.get();
+    const prefix = getAddonMessagePrefix(addonMessage);
 
-    if (isSpecsReadyMessage(addonMessage)) {
-      SPECS_CONTROLLER.sendList(sender);
-      return;
-    }
-
-    const switchSpecId = getAddonMessageBody(addonMessage, AddonPrefix.SWITCH_SPEC);
-
-    if (switchSpecId !== undefined) {
-      beginSpecSwitch(sender, switchSpecId);
-      return;
-    }
-
-    const actionBarSlot = getAddonMessageBody(addonMessage, AddonPrefix.SPEC_BAR_SLOT);
-
-    if (actionBarSlot !== undefined) {
-      addActionBarSlot(sender, actionBarSlot);
-      return;
-    }
-
-    if (getAddonMessageBody(addonMessage, AddonPrefix.SPEC_BAR_DONE) !== undefined) {
-      finishSpecSwitch(sender);
+    switch (prefix) {
+      case AddonPrefix.SPECS_READY:
+        SPECS_CONTROLLER.sendList(sender);
+        break;
+      case AddonPrefix.SWITCH_SPEC:
+        beginSpecSwitch(
+          sender,
+          getAddonMessageBody(addonMessage, AddonPrefix.SWITCH_SPEC) || "",
+        );
+        break;
+      case AddonPrefix.SPEC_BAR_SLOT:
+        addActionBarSlot(
+          sender,
+          getAddonMessageBody(addonMessage, AddonPrefix.SPEC_BAR_SLOT) || "",
+        );
+        break;
+      case AddonPrefix.SPEC_BAR_DONE:
+        finishSpecSwitch(sender);
+        break;
     }
   });
 }

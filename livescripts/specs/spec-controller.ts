@@ -1,5 +1,8 @@
 import { AddonPrefix } from "../../shared/prefix";
-import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
+import {
+  buildActionBarSlotPayload,
+  type SpecActionBarSlot,
+} from "../../shared/specs/actionbar.types";
 import { CharacterSpecActionBarStore } from "./character-spec-actionbar-store";
 import { CharacterSpecStore } from "./character-spec-store";
 import { buildSpecPayload } from "./spec-payload-builder";
@@ -58,7 +61,7 @@ export const SPECS_CONTROLLER = {
     for (const slot of slots) {
       player.SendAddonMessage(
         AddonPrefix.SPEC_BAR_SLOT,
-        `${slot.slot}|${slot.actionType}|${slot.actionId}`,
+        buildActionBarSlotPayload(slot),
         0,
         player,
       );

@@ -1,12 +1,12 @@
 import { AddonPrefix } from "../../shared/prefix";
-import type {
-  SpecActionBarSlot,
-  SpecActionType,
+import {
+  buildActionBarSlotPayload,
+  isSpecActionType,
+  type SpecActionBarSlot,
 } from "../../shared/specs/actionbar.types";
 
 const FIRST_ACTION_SLOT = 1;
 const LAST_ACTION_SLOT = 120;
-const SUPPORTED_ACTION_TYPES: SpecActionType[] = ["spell", "item", "macro"];
 const spellTooltip = CreateFrame(
   "GameTooltip",
   "NikevSpecActionBarTooltip",
@@ -14,18 +14,13 @@ const spellTooltip = CreateFrame(
   "GameTooltipTemplate",
 );
 
-function isSupportedActionType(
-  actionType: string,
-): actionType is SpecActionType {
-  return SUPPORTED_ACTION_TYPES.includes(actionType as SpecActionType);
-}
-
 function getSpellIdFromActionSlot(slot: number): number | undefined {
   spellTooltip.SetOwner(UIParent, "ANCHOR_NONE");
   spellTooltip.ClearLines();
   spellTooltip.SetAction(slot as ActionBarSlotId);
 
-  const [_name, _rank, spellId] = spellTooltip.GetSpell();
+  const [_name, spellId] = spellTooltip.GetSpell();
+  spellTooltip.Hide();
 
   return Number(spellId);
 }
@@ -37,7 +32,7 @@ export function captureActionBar(): SpecActionBarSlot[] {
     if (HasAction(slot as ActionBarSlotId)) {
       const [actionType, actionId] = GetActionInfo(slot as ActionBarSlotId);
 
-      if (isSupportedActionType(actionType)) {
+      if (isSpecActionType(actionType)) {
         const numericActionId =
           actionType === "spell"
             ? getSpellIdFromActionSlot(slot)
@@ -54,30 +49,6 @@ export function captureActionBar(): SpecActionBarSlot[] {
   }
 
   return slots;
-}
-
-export function buildActionBarSlotPayload(slot: SpecActionBarSlot): string {
-  return `${slot.slot}|${slot.actionType}|${slot.actionId}`;
-}
-
-export function parseActionBarSlotPayload(
-  payload: string,
-): SpecActionBarSlot | undefined {
-  const split = payload.split("|");
-  const slot = Number(split[0]);
-  const actionType = split[1];
-  const actionId = Number(split[2]);
-
-  if (
-    slot !== slot ||
-    actionId !== actionId ||
-    actionType === undefined ||
-    !isSupportedActionType(actionType)
-  ) {
-    return undefined;
-  }
-
-  return { slot, actionType, actionId };
 }
 
 export function clearActionBar(): void {
