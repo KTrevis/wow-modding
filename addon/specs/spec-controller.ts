@@ -30,6 +30,16 @@ export class SpecController {
     SendAddonMessage(AddonPrefix.SPECS_READY, "", "WHISPER", UnitName("player"));
   }
 
+  private switchSpec(spec: ClientSpec): void {
+    SendAddonMessage(
+      AddonPrefix.SWITCH_SPEC,
+      spec.id,
+      "WHISPER",
+      UnitName("player"),
+    );
+    print(`[NikevSpecs] selected ${spec.name}`);
+  }
+
   private bindEvents(): void {
     this.eventFrame.RegisterEvent("PLAYER_LOGIN");
     this.eventFrame.RegisterEvent("CHAT_MSG_ADDON");
@@ -72,7 +82,7 @@ export class SpecController {
 
       positionSpecButton(button, this.ui.buttonParent, i);
       button.SetText(spec.name);
-      button.SetScript("OnClick", () => print(`[NikevSpecs] selected ${spec.name}`));
+      button.SetScript("OnClick", () => this.switchSpec(spec));
       button.Show();
     }
 
