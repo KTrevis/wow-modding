@@ -1,5 +1,12 @@
 import { AddonPrefix } from "../../shared/prefix";
+import type { SpecActionBarSlot } from "../../shared/specs/actionbar.types";
 import type { ClientSpec } from "../../shared/specs/spec.types";
+import {
+  clearActionBar,
+  parseActionBarSlotPayload,
+  placeActionBarSlot,
+  sendActionBarSnapshot,
+} from "./spec-actionbar";
 import { parseSpecs } from "./spec-parse";
 import { createSpecsUi, positionSpecButton } from "./spec-ui";
 
@@ -8,6 +15,7 @@ export class SpecController {
   private readonly ui = createSpecsUi();
   private readonly buttons: WoWAPI.Button[] = [];
   private specs: ClientSpec[] = [];
+  private pendingActionBarSlots: SpecActionBarSlot[] = [];
 
   constructor() {
     this.bindEvents();
@@ -27,17 +35,39 @@ export class SpecController {
   }
 
   private requestSpecs(): void {
-    SendAddonMessage(AddonPrefix.SPECS_READY, "", "WHISPER", UnitName("player"));
-  }
-
-  private switchSpec(spec: ClientSpec): void {
     SendAddonMessage(
-      AddonPrefix.SWITCH_SPEC,
-      spec.id,
+      AddonPrefix.SPECS_READY,
+      "",
       "WHISPER",
       UnitName("player"),
     );
-    print(`[NikevSpecs] selected ${spec.name}`);
+  }
+
+  private switchSpec(spec: ClientSpec): void {
+    sendActionBarSnapshot(spec.id);
+  }
+
+  private beginActionBarLoad(): void {
+    this.pendingActionBarSlots = [];
+    clearActionBar();
+  }
+
+  private queueActionBarSlot(payload: string): void {
+    const slot = parseActionBarSlotPayload(payload);
+
+    if (slot === undefined) {
+      return;
+    }
+
+    this.pendingActionBarSlots.push(slot);
+  }
+
+  private finishActionBarLoad(): void {
+    for (const slot of this.pendingActionBarSlots) {
+      placeActionBarSlot(slot);
+    }
+
+    this.pendingActionBarSlots = [];
   }
 
   private bindEvents(): void {
@@ -50,20 +80,20 @@ export class SpecController {
         return;
       }
 
-      if (prefix !== AddonPrefix.SPECS_LIST) {
-        return;
+      if (prefix === AddonPrefix.SPECS_LIST) {
+        this.setSpecs(parseSpecs(message));
+      } else if (prefix === AddonPrefix.SPEC_BAR_LOAD) {
+        this.beginActionBarLoad();
+      } else if (prefix === AddonPrefix.SPEC_BAR_SLOT) {
+        this.queueActionBarSlot(message);
+      } else if (prefix === AddonPrefix.SPEC_BAR_DONE) {
+        this.finishActionBarLoad();
       }
-
-      this.setSpecs(parseSpecs(message));
     });
   }
 
   private setSpecs(specs: ClientSpec[]): void {
     this.specs = specs;
-
-    for (const spec of this.specs) {
-      print(`[NikevSpecs] ${spec.name} (${spec.id})`);
-    }
 
     this.render();
     this.show();
