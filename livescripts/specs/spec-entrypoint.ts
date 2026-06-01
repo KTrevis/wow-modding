@@ -3,7 +3,9 @@ import {
   parseActionBarSlotPayload,
   type SpecActionBarSlot,
 } from "../../shared/specs/actionbar-types";
+import { CharacterSpecStore } from "./character-spec-store";
 import { SPECS_CONTROLLER } from "./spec-controller";
+import { CLASSES_SPECS } from "./spec-list";
 
 type PendingSpecSwitch = {
   specId: string;
@@ -67,6 +69,15 @@ function finishSpecSwitch(player: TSPlayer): void {
 }
 
 export function specEntrypoint(events: TSEvents): void {
+  events.Player.OnLevelChanged((player) => {
+    const specId = CharacterSpecStore.get(player.GetGUIDLow());
+
+    if (!specId) {
+      return;
+    }
+    SPECS_CONTROLLER.learnSpecSpells(player, specId);
+  });
+
   events.Player.OnWhisper((sender, receiver, message) => {
     if (sender !== receiver) {
       return;

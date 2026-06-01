@@ -1,3 +1,5 @@
+import { UTAGS } from "../utils/utags";
+
 export type SpecId = "arms" | "fury" | "prot";
 
 export type Spec = {
@@ -12,18 +14,22 @@ export const CLASSES_SPECS: Record<Class, readonly Spec[]> = {
       id: "arms",
       name: "Arms",
       spells: {
-        1: [2136],
+        2: [UTAGS.WARRIOR.CHARGE],
       },
     },
     {
       id: "fury",
       name: "Fury",
-      spells: {},
+      spells: {
+        2: [UTAGS.WARRIOR.CHARGE],
+      },
     },
     {
       id: "prot",
       name: "Protection",
-      spells: {},
+      spells: {
+        2: [UTAGS.WARRIOR.CHARGE],
+      },
     },
   ],
   [Class.DEATH_KNIGHT]: [],

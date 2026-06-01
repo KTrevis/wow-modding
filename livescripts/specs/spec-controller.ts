@@ -56,7 +56,7 @@ export const SPECS_CONTROLLER = {
     }
   },
 
-  learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId: string) {
+  learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId?: string) {
     const classId = player.GetClass() as Class;
     const specs = CLASSES_SPECS[classId] || [];
     const newSpec = specs.find((curr) => curr.id === newSpecId);
@@ -79,11 +79,14 @@ export const SPECS_CONTROLLER = {
     }
 
     for (const level in newSpec.spells) {
+      const spells = newSpec.spells[Number(level)];
       if (player.GetLevel() >= Number(level)) {
-        const spells = newSpec.spells[Number(level)];
-
         for (const curr of spells) {
           player.LearnSpell(curr);
+        }
+      } else {
+        for (const curr of spells) {
+          player.RemoveSpell(curr, false, false);
         }
       }
     }
