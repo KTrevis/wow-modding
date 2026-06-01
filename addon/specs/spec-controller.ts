@@ -10,11 +10,14 @@ import {
   sendActionBarSnapshot,
 } from "./spec-actionbar";
 import { parseSpecs } from "./spec-parse";
+import { SpellLearnedNotificationColumn } from "./spec-spell-notification";
 import { createSpecsUi, positionSpecButton } from "./spec-ui";
 
 export class SpecController {
   private readonly eventFrame = CreateFrame("Frame");
   private readonly ui = createSpecsUi();
+  private readonly spellLearnedNotifications =
+    new SpellLearnedNotificationColumn();
   private readonly buttons: WoWAPI.Button[] = [];
   private specs: ClientSpec[] = [];
   private pendingActionBarSlots: SpecActionBarSlot[] = [];
@@ -81,6 +84,16 @@ export class SpecController {
     this.pendingActionBarSlots = [];
   }
 
+  private showLearnedSpellMessage(payload: string): void {
+    const spellId = Number(payload);
+
+    if (spellId !== spellId) {
+      return;
+    }
+
+    this.spellLearnedNotifications.show(spellId);
+  }
+
   private bindEvents(): void {
     this.eventFrame.RegisterEvent("PLAYER_LOGIN");
     this.eventFrame.RegisterEvent("CHAT_MSG_ADDON");
@@ -99,6 +112,8 @@ export class SpecController {
         this.queueActionBarSlot(message);
       } else if (prefix === AddonPrefix.SPEC_BAR_DONE) {
         this.finishActionBarLoad();
+      } else if (prefix === AddonPrefix.SPEC_SPELL_LEARNED) {
+        this.showLearnedSpellMessage(message);
       }
     });
   }

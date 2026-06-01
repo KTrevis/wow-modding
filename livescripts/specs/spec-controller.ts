@@ -82,7 +82,18 @@ export const SPECS_CONTROLLER = {
       const spells = newSpec.spells[Number(level)];
       if (player.GetLevel() >= Number(level)) {
         for (const curr of spells) {
+          const alreadyKnown = player.HasSpell(curr);
+
           player.LearnSpell(curr);
+
+          if (!alreadyKnown) {
+            player.SendAddonMessage(
+              AddonPrefix.SPEC_SPELL_LEARNED,
+              `${curr}`,
+              0,
+              player,
+            );
+          }
         }
       } else {
         for (const curr of spells) {
