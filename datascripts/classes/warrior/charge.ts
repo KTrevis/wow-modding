@@ -3,9 +3,4 @@ import { MODULE_NAME } from "../../utils/constants/module-name.constants";
 
 const ID = "WARRIOR_CHARGE_";
 
-std.Spells.create(MODULE_NAME, ID + "SPELL", 11578)
-  .Subtext.enGB.set("")
-  .Effects.mod(1, (eff) =>
-    eff.Type.ENERGIZE.set().PowerType.RAGE.set().PowerBase.set(150),
-  )
-  .Tags.addUnique(MODULE_NAME, ID + "UTAG");
+std.Spells.load(11578).Tags.addUnique(MODULE_NAME, ID + "UTAG");

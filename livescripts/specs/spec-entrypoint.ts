@@ -68,7 +68,30 @@ function finishSpecSwitch(player: TSPlayer): void {
   delete pendingSwitches[characterId];
 }
 
+function initializeFirstSpec(player: TSPlayer): void {
+  const characterId = player.GetGUIDLow();
+
+  if (CharacterSpecStore.get(characterId) !== undefined) {
+    return;
+  }
+
+  const firstSpec = CLASSES_SPECS[player.GetClass() as Class]?.specs[0];
+
+  if (firstSpec === undefined) {
+    return;
+  }
+
+  CharacterSpecStore.save(characterId, firstSpec.id);
+  SPECS_CONTROLLER.learnSpecSpells(player, firstSpec.id);
+}
+
 export function specEntrypoint(events: TSEvents): void {
+  // events.Player.OnLogin((player, firstLogin) => {
+  //   if (firstLogin) {
+  //     initializeFirstSpec(player);
+  //   }
+  // });
+
   events.Player.OnLevelChanged((player) => {
     const specId = CharacterSpecStore.get(player.GetGUIDLow());
 

@@ -8,37 +8,42 @@ export type Spec = {
   readonly spells: Record<number, readonly number[]>;
 }; // number: requiredLevel, number[]: spellIds
 
-export const CLASSES_SPECS: Record<Class, readonly Spec[]> = {
-  [Class.WARRIOR]: [
-    {
-      id: "arms",
-      name: "Arms",
-      spells: {
-        2: [UTAGS.WARRIOR.CHARGE],
-      },
+export type ClassSpecs = {
+  readonly specs: readonly Spec[];
+  readonly baseline: Record<number, readonly number[]>;
+};
+
+export const CLASSES_SPECS: Record<Class, ClassSpecs> = {
+  [Class.WARRIOR]: {
+    baseline: {
+      2: [UTAGS.WARRIOR.CHARGE],
+      4: [UTAGS.WARRIOR.REND],
     },
-    {
-      id: "fury",
-      name: "Fury",
-      spells: {
-        2: [UTAGS.WARRIOR.CHARGE],
+    specs: [
+      {
+        id: "arms",
+        name: "Arms",
+        spells: {},
       },
-    },
-    {
-      id: "prot",
-      name: "Protection",
-      spells: {
-        2: [UTAGS.WARRIOR.CHARGE],
+      {
+        id: "fury",
+        name: "Fury",
+        spells: {},
       },
-    },
-  ],
-  [Class.DEATH_KNIGHT]: [],
-  [Class.DRUID]: [],
-  [Class.HUNTER]: [],
-  [Class.MAGE]: [],
-  [Class.PALADIN]: [],
-  [Class.PRIEST]: [],
-  [Class.ROGUE]: [],
-  [Class.SHAMAN]: [],
-  [Class.WARLOCK]: [],
+      {
+        id: "prot",
+        name: "Protection",
+        spells: {},
+      },
+    ],
+  },
+  [Class.DEATH_KNIGHT]: { baseline: {}, specs: [] },
+  [Class.DRUID]: { baseline: {}, specs: [] },
+  [Class.HUNTER]: { baseline: {}, specs: [] },
+  [Class.MAGE]: { baseline: {}, specs: [] },
+  [Class.PALADIN]: { baseline: {}, specs: [] },
+  [Class.PRIEST]: { baseline: {}, specs: [] },
+  [Class.ROGUE]: { baseline: {}, specs: [] },
+  [Class.SHAMAN]: { baseline: {}, specs: [] },
+  [Class.WARLOCK]: { baseline: {}, specs: [] },
 };

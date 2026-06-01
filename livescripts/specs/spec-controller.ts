@@ -8,9 +8,38 @@ import { CharacterSpecStore } from "./character-spec-store";
 import { buildSpecPayload } from "./spec-payload-builder";
 import { CLASSES_SPECS } from "./spec-list";
 
+function learnLeveledSpells(
+  player: TSPlayer,
+  spellsByLevel: Record<number, readonly number[]>,
+): void {
+  for (const level in spellsByLevel) {
+    const spells = spellsByLevel[Number(level)];
+    if (player.GetLevel() >= Number(level)) {
+      for (const curr of spells) {
+        const alreadyKnown = player.HasSpell(curr);
+
+        player.LearnSpell(curr);
+
+        if (!alreadyKnown) {
+          player.SendAddonMessage(
+            AddonPrefix.SPEC_SPELL_LEARNED,
+            `${curr}`,
+            0,
+            player,
+          );
+        }
+      }
+    } else {
+      for (const curr of spells) {
+        player.RemoveSpell(curr, false, false);
+      }
+    }
+  }
+}
+
 export const SPECS_CONTROLLER = {
   sendList(player: TSPlayer): void {
-    const specs = CLASSES_SPECS[player.GetClass() as Class] || [];
+    const specs = CLASSES_SPECS[player.GetClass() as Class]?.specs || [];
     const activeSpecId = CharacterSpecStore.get(player.GetGUIDLow());
 
     player.SendAddonMessage(
@@ -26,7 +55,7 @@ export const SPECS_CONTROLLER = {
     specId: string,
     actionBarSlots: SpecActionBarSlot[],
   ): void {
-    const specs = CLASSES_SPECS[player.GetClass() as Class] || [];
+    const specs = CLASSES_SPECS[player.GetClass() as Class]?.specs || [];
     const spec = specs.find((curr) => curr.id === specId);
 
     if (spec === undefined) {
@@ -58,7 +87,8 @@ export const SPECS_CONTROLLER = {
 
   learnSpecSpells(player: TSPlayer, newSpecId: string, oldSpecId?: string) {
     const classId = player.GetClass() as Class;
-    const specs = CLASSES_SPECS[classId] || [];
+    const classSpecs = CLASSES_SPECS[classId];
+    const specs = classSpecs?.specs || [];
     const newSpec = specs.find((curr) => curr.id === newSpecId);
     const oldSpec = specs.find((curr) => curr.id === oldSpecId);
 
@@ -75,32 +105,10 @@ export const SPECS_CONTROLLER = {
           player.RemoveSpell(curr, false, false);
         }
       }
-      return;
     }
 
-    for (const level in newSpec.spells) {
-      const spells = newSpec.spells[Number(level)];
-      if (player.GetLevel() >= Number(level)) {
-        for (const curr of spells) {
-          const alreadyKnown = player.HasSpell(curr);
-
-          player.LearnSpell(curr);
-
-          if (!alreadyKnown) {
-            player.SendAddonMessage(
-              AddonPrefix.SPEC_SPELL_LEARNED,
-              `${curr}`,
-              0,
-              player,
-            );
-          }
-        }
-      } else {
-        for (const curr of spells) {
-          player.RemoveSpell(curr, false, false);
-        }
-      }
-    }
+    learnLeveledSpells(player, classSpecs?.baseline || {});
+    learnLeveledSpells(player, newSpec.spells);
   },
 
   sendActionBar(player: TSPlayer, specId: string): void {
