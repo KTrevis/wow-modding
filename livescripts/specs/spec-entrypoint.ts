@@ -86,11 +86,13 @@ function initializeFirstSpec(player: TSPlayer): void {
 }
 
 export function specEntrypoint(events: TSEvents): void {
-  // events.Player.OnLogin((player, firstLogin) => {
-  //   if (firstLogin) {
-  //     initializeFirstSpec(player);
-  //   }
-  // });
+  events.Player.OnLogin((player, firstLogin) => {
+    if (firstLogin) {
+      player.AddNamedTimer("spec-login-timer", 100, 1, 0, () => {
+        initializeFirstSpec(player);
+      });
+    }
+  });
 
   events.Player.OnLevelChanged((player) => {
     const specId = CharacterSpecStore.get(player.GetGUIDLow());
